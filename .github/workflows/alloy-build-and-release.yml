@@ -7,6 +7,7 @@ on:
     tags:
       - 'v*'
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,14 +33,20 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@49933aa1476afc5d8a0673ddc6a8aee7890b9d9 # v4.4.0
+        with:
+          node-version-file: internal/web/ui/.nvmrc
+          cache: npm
+          cache-dependency-path: internal/web/ui/package-lock.json
+
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
 
-      - name: Build Alloy
-        run: SKIP_UI_BUILD=1 RELEASE_BUILD=1 GOOS=linux GOARCH=amd64 make alloy
-
-      - name: Binary info
-        run: ls -lh build/alloy && file build/alloy
+      - name: Build Alloy with embedded UI
+        run: ./scripts/build-linux-amd64.sh
+        env:
+          VERSION: ${{ github.sha }}
 
   release_linux_amd64:
     name: Release linux/amd64
@@ -59,11 +66,18 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Set up Node.js
+        uses: actions/setup-node@49933aa1476afc5d8a0673ddc6a8aee7890b9d9 # v4.4.0
+        with:
+          node-version-file: internal/web/ui/.nvmrc
+          cache: npm
+          cache-dependency-path: internal/web/ui/package-lock.json
+
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
 
-      - name: Build Alloy
-        run: SKIP_UI_BUILD=1 RELEASE_BUILD=1 GOOS=linux GOARCH=amd64 make alloy
+      - name: Build Alloy with embedded UI
+        run: ./scripts/build-linux-amd64.sh
         env:
           VERSION: ${{ github.ref_name }}
 
@@ -83,6 +97,7 @@ jobs:
           generate_release_notes: true
           body: |
             Grafana Alloy docker-state distribution with `prometheus.exporter.docker_state`.
+            Built with embedded UI (`embedalloyui`).
 
             ## Usage
 
