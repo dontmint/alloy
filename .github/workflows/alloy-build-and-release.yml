@@ -1,0 +1,106 @@
+name: Alloy build and release
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: alloy-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_linux_amd64:
+    name: Build linux/amd64
+    if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
+
+      - name: Build Alloy
+        run: SKIP_UI_BUILD=1 RELEASE_BUILD=1 GOOS=linux GOARCH=amd64 make alloy
+
+      - name: Binary info
+        run: ls -lh build/alloy && file build/alloy
+
+  release_linux_amd64:
+    name: Release linux/amd64
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Go
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install build dependencies
+        run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
+
+      - name: Build Alloy
+        run: SKIP_UI_BUILD=1 RELEASE_BUILD=1 GOOS=linux GOARCH=amd64 make alloy
+        env:
+          VERSION: ${{ github.ref_name }}
+
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          cp build/alloy dist/alloy-linux-amd64
+          chmod +x dist/alloy-linux-amd64
+          xz -9 -k dist/alloy-linux-amd64
+          ls -lh dist/
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@ea676450d5830bbac67c526c92f479bd458b409 # v2.0.3
+        with:
+          files: dist/alloy-linux-amd64.xz
+          generate_release_notes: true
+          body: |
+            Grafana Alloy build with `docker_state_exporter` integration.
+
+            ## Usage
+
+            ```alloy
+            prometheus.exporter.docker_state "example" {
+              docker_host   = "unix:///var/run/docker.sock"
+              cache_period  = 1
+              enable_labels = true
+            }
+            ```
+
+            ## Metrics
+
+            - `container_state_health_status`
+            - `container_state_status`
+            - `container_state_oomkilled`
+            - `container_state_startedat`
+            - `container_state_finishedat`
+            - `container_restartcount`
+            - `container_exitcode`
+
+            Unpack: `xz -d alloy-linux-amd64.xz && chmod +x alloy-linux-amd64`

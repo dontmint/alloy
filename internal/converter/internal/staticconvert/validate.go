@@ -15,6 +15,7 @@ import (
 	"github.com/grafana/alloy/internal/static/integrations/cloudwatch_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/consul_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/dnsmasq_exporter"
+	"github.com/grafana/alloy/internal/static/integrations/docker_state_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/elasticsearch_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/gcp_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/github_exporter"
@@ -135,6 +136,7 @@ func validateIntegrationsV1(integrationsConfig *v1.ManagerConfig) diag.Diagnosti
 		case *cloudwatch_exporter.Config:
 		case *consul_exporter.Config:
 		case *dnsmasq_exporter.Config:
+		case *docker_state_exporter.Config:
 		case *elasticsearch_exporter.Config:
 		case *gcp_exporter.Config:
 		case *github_exporter.Config:
@@ -187,6 +189,7 @@ func validateIntegrationsV2(integrationsConfig *v2.SubsystemOptions) diag.Diagno
 			case *cloudwatch_exporter.Config:
 			case *consul_exporter.Config:
 			case *dnsmasq_exporter.Config:
+			case *docker_state_exporter.Config:
 			case *elasticsearch_exporter.Config:
 			case *gcp_exporter.Config:
 			case *github_exporter.Config:

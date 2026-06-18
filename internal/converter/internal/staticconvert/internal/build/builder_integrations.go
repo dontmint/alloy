@@ -25,6 +25,7 @@ import (
 	int_config "github.com/grafana/alloy/internal/static/integrations/config"
 	"github.com/grafana/alloy/internal/static/integrations/consul_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/dnsmasq_exporter"
+	"github.com/grafana/alloy/internal/static/integrations/docker_state_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/elasticsearch_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/gcp_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/github_exporter"
@@ -97,6 +98,8 @@ func (b *ConfigBuilder) appendV1Integrations() {
 			exports = b.appendConsulExporter(itg, nil)
 		case *dnsmasq_exporter.Config:
 			exports = b.appendDnsmasqExporter(itg, nil)
+		case *docker_state_exporter.Config:
+			exports = b.appendDockerStateExporter(itg, nil)
 		case *elasticsearch_exporter.Config:
 			exports = b.appendElasticsearchExporter(itg, nil)
 		case *gcp_exporter.Config:
@@ -234,6 +237,8 @@ func (b *ConfigBuilder) appendV2Integrations() {
 				exports = b.appendConsulExporter(v1_itg, itg.Common.InstanceKey)
 			case *dnsmasq_exporter.Config:
 				exports = b.appendDnsmasqExporter(v1_itg, itg.Common.InstanceKey)
+			case *docker_state_exporter.Config:
+				exports = b.appendDockerStateExporter(v1_itg, itg.Common.InstanceKey)
 			case *elasticsearch_exporter.Config:
 				exports = b.appendElasticsearchExporter(v1_itg, itg.Common.InstanceKey)
 			case *gcp_exporter.Config:
