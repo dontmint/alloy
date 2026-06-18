@@ -76,7 +76,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@ea676450d5830bbac67c526c92f479bd458b409 # v2.0.3
+        uses: softprops/action-gh-release@288696be3916479e99fa944c72825e9b3e192be4 # v2.0.3
         with:
           name: Alloy ${{ github.ref_name }}
           files: dist/alloy-linux-amd64.xz
