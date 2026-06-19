@@ -1,0 +1,187 @@
+// Copyright 2022 The Prometheus Authors
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package smartctl_exporter
+
+import (
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/go-kit/log"
+	"github.com/go-kit/log/level"
+	"github.com/tidwall/gjson"
+)
+
+// JSONCache caching json
+type JSONCache struct {
+	JSON        gjson.Result
+	LastCollect time.Time
+}
+
+// Runtime holds smartctl execution settings for a collector instance.
+type Runtime struct {
+	Path          string
+	Interval      time.Duration
+	DeviceExclude string
+	DeviceInclude string
+	FakeData      bool
+
+	jsonCache sync.Map
+}
+
+func (r *Runtime) initCache() {
+	r.jsonCache.Store("", JSONCache{})
+}
+
+// Parse json to gjson object
+func parseJSON(data string) gjson.Result {
+	if !gjson.Valid(data) {
+		return gjson.Parse("{}")
+	}
+	return gjson.Parse(data)
+}
+
+// Reading fake smartctl json
+func (r *Runtime) readFakeSMARTctl(logger log.Logger, device string) gjson.Result {
+	s := strings.Split(device, "/")
+	filename := fmt.Sprintf("debug/%s.json", s[len(s)-1])
+	level.Debug(logger).Log("msg", "Read fake S.M.A.R.T. data from json", "filename", filename)
+	jsonFile, err := os.ReadFile(filename)
+	if err != nil {
+		level.Error(logger).Log("msg", "Fake S.M.A.R.T. data reading error", "err", err)
+		return parseJSON("{}")
+	}
+	return parseJSON(string(jsonFile))
+}
+
+// Get json from smartctl and parse it
+func (r *Runtime) readSMARTctl(logger log.Logger, device string) (gjson.Result, bool) {
+	start := time.Now()
+	out, err := exec.Command(r.Path, "--json", "--info", "--health", "--attributes", "--tolerance=verypermissive", "--nocheck=standby", "--format=brief", "--log=error", device).Output()
+	if err != nil {
+		level.Warn(logger).Log("msg", "S.M.A.R.T. output reading", "err", err, "device", device)
+	}
+	json := parseJSON(string(out))
+	rcOk := resultCodeIsOk(logger, device, json.Get("smartctl.exit_status").Int())
+	jsonOk := jsonIsOk(logger, json)
+	level.Debug(logger).Log("msg", "Collected S.M.A.R.T. json data", "device", device, "duration", time.Since(start))
+	return json, rcOk && jsonOk
+}
+
+func (r *Runtime) readSMARTctlDevices(logger log.Logger) gjson.Result {
+	level.Debug(logger).Log("msg", "Scanning for devices")
+	out, err := exec.Command(r.Path, "--json", "--scan").Output()
+	if exiterr, ok := err.(*exec.ExitError); ok {
+		level.Debug(logger).Log("msg", "Exit Status", "exit_code", exiterr.ExitCode())
+		// The smartctl command returns 2 if devices are sleeping, ignore this error.
+		if exiterr.ExitCode() != 2 {
+			level.Warn(logger).Log("msg", "S.M.A.R.T. output reading error", "err", err)
+			return gjson.Result{}
+		}
+	}
+	return parseJSON(string(out))
+}
+
+// Select json source and parse
+func (r *Runtime) readData(logger log.Logger, device string) gjson.Result {
+	if r.FakeData {
+		return r.readFakeSMARTctl(logger, device)
+	}
+
+	cacheValue, cacheOk := r.jsonCache.Load(device)
+	if !cacheOk || time.Now().After(cacheValue.(JSONCache).LastCollect.Add(r.Interval)) {
+		json, ok := r.readSMARTctl(logger, device)
+		if ok {
+			r.jsonCache.Store(device, JSONCache{JSON: json, LastCollect: time.Now()})
+			j, found := r.jsonCache.Load(device)
+			if !found {
+				level.Warn(logger).Log("msg", "device not found", "device", device)
+			}
+			return j.(JSONCache).JSON
+		}
+		return gjson.Result{}
+	}
+	return cacheValue.(JSONCache).JSON
+}
+
+// scanDevices uses smartctl to gather the list of available devices.
+func (r *Runtime) scanDevices(logger log.Logger) []string {
+	filter := newDeviceFilter(r.DeviceExclude, r.DeviceInclude)
+
+	json := r.readSMARTctlDevices(logger)
+	scanDevices := json.Get("devices").Array()
+	var scanDeviceResult []string
+	for _, d := range scanDevices {
+		deviceName := d.Get("name").String()
+		if filter.ignored(deviceName) {
+			level.Info(logger).Log("msg", "Ignoring device", "name", deviceName)
+		} else {
+			level.Info(logger).Log("msg", "Found device", "name", deviceName)
+			scanDeviceResult = append(scanDeviceResult, deviceName)
+		}
+	}
+	return scanDeviceResult
+}
+
+// Parse smartctl return code
+func resultCodeIsOk(logger log.Logger, device string, SMARTCtlResult int64) bool {
+	result := true
+	if SMARTCtlResult > 0 {
+		b := SMARTCtlResult
+		if (b & 1) != 0 {
+			level.Error(logger).Log("msg", "Command line did not parse", "device", device)
+			result = false
+		}
+		if (b & (1 << 1)) != 0 {
+			level.Error(logger).Log("msg", "Device open failed, device did not return an IDENTIFY DEVICE structure, or device is in a low-power mode", "device", device)
+			result = false
+		}
+		if (b & (1 << 2)) != 0 {
+			level.Warn(logger).Log("msg", "Some SMART or other ATA command to the disk failed, or there was a checksum error in a SMART data structure", "device", device)
+		}
+		if (b & (1 << 3)) != 0 {
+			level.Warn(logger).Log("msg", "SMART status check returned 'DISK FAILING'", "device", device)
+		}
+		if (b & (1 << 4)) != 0 {
+			level.Warn(logger).Log("msg", "We found prefail Attributes <= threshold", "device", device)
+		}
+		if (b & (1 << 5)) != 0 {
+			level.Warn(logger).Log("msg", "SMART status check returned 'DISK OK' but we found that some (usage or prefail) Attributes have been <= threshold at some time in the past", "device", device)
+		}
+		if (b & (1 << 6)) != 0 {
+			level.Warn(logger).Log("msg", "The device error log contains records of errors", "device", device)
+		}
+		if (b & (1 << 7)) != 0 {
+			level.Warn(logger).Log("msg", "The device self-test log contains records of errors. [ATA only] Failed self-tests outdated by a newer successful extended self-test are ignored", "device", device)
+		}
+	}
+	return result
+}
+
+// Check json
+func jsonIsOk(logger log.Logger, json gjson.Result) bool {
+	messages := json.Get("smartctl.messages")
+	if messages.Exists() {
+		for _, message := range messages.Array() {
+			if message.Get("severity").String() == "error" {
+				level.Error(logger).Log("msg", message.Get("string").String())
+				return false
+			}
+		}
+	}
+	return true
+}

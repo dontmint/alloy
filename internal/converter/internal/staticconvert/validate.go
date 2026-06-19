@@ -30,6 +30,7 @@ import (
 	"github.com/grafana/alloy/internal/static/integrations/process_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/redis_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/snmp_exporter"
+	"github.com/grafana/alloy/internal/static/integrations/smartctl_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/snowflake_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/squid_exporter"
 	"github.com/grafana/alloy/internal/static/integrations/statsd_exporter"
@@ -150,6 +151,7 @@ func validateIntegrationsV1(integrationsConfig *v1.ManagerConfig) diag.Diagnosti
 		case *process_exporter.Config:
 		case *redis_exporter.Config:
 		case *snmp_exporter.Config:
+		case *smartctl_exporter.Config:
 		case *snowflake_exporter.Config:
 		case *squid_exporter.Config:
 		case *statsd_exporter.Config:

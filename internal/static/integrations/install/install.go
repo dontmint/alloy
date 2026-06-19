@@ -30,6 +30,7 @@ import (
 	_ "github.com/grafana/alloy/internal/static/integrations/process_exporter"       // register process_exporter
 	_ "github.com/grafana/alloy/internal/static/integrations/redis_exporter"         // register redis_exporter
 	_ "github.com/grafana/alloy/internal/static/integrations/snmp_exporter"          // register snmp_exporter
+	_ "github.com/grafana/alloy/internal/static/integrations/smartctl_exporter"     // register smartctl_exporter
 	_ "github.com/grafana/alloy/internal/static/integrations/snowflake_exporter"     // register snowflake_exporter
 	_ "github.com/grafana/alloy/internal/static/integrations/squid_exporter"         // register squid_exporter
 	_ "github.com/grafana/alloy/internal/static/integrations/statsd_exporter"        // register statsd_exporter
