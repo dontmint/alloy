@@ -6,6 +6,8 @@ go 1.26.4
 // It is intentionally kept outside the generated block to avoid being overwritten by dependency management tools.
 replace github.com/grafana/alloy/syntax => ./syntax
 
+replace github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery => ./internal/opentelemetry/sqlquery
+
 require (
 	cloud.google.com/go/pubsub/v2 v2.4.0
 	connectrpc.com/connect v1.19.1
@@ -993,6 +995,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/googleclientauthextension v0.147.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/splunk v0.147.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/nginxreceiver v0.147.0
+	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.147.0
 	github.com/spf13/viper v1.21.0
 	github.com/vektah/gqlparser/v2 v2.5.33
 	github.com/zricethezav/gitleaks/v8 v8.30.0
@@ -1017,6 +1020,7 @@ require (
 	github.com/DataDog/datadog-agent/pkg/trace/traceutil v0.77.0-devel.0.20260213154712-e02b9359151a // indirect
 	github.com/DeRuina/timberjack v1.3.9 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.54.0 // indirect
+	github.com/SAP/go-hdb v1.15.0 // indirect
 	github.com/STARRY-S/zip v0.2.3 // indirect
 	github.com/VictoriaMetrics/easyproto v1.2.0 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
@@ -1064,6 +1068,7 @@ require (
 	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/jackc/pgx/v5 v5.9.2 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -1081,6 +1086,8 @@ require (
 	github.com/nginx/nginx-prometheus-exporter v1.5.1 // indirect
 	github.com/nwaples/rardecode/v2 v2.2.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/internal/credentialsfile v0.147.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.147.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.147.0 // indirect
 	github.com/opencontainers/cgroups v0.0.4 // indirect
 	github.com/oschwald/maxminddb-golang/v2 v2.2.0 // indirect
 	github.com/paulmach/orb v0.12.0 // indirect
@@ -1097,6 +1104,7 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
+	github.com/thda/tds v0.1.7 // indirect
 	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/urfave/cli/v3 v3.7.0 // indirect
 	github.com/wasilibs/go-re2 v1.9.0 // indirect
