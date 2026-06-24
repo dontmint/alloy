@@ -17,8 +17,8 @@ helper scripts under `scripts/`.
 ## Full profile
 
 The default upstream-style distribution. All Flow components, vendor Prometheus
-exporters, Kubernetes operators, Loki/Pyroscope/Beyla components, and the
-embedded web UI are included.
+exporters, Kubernetes operators, Loki/Pyroscope components, and the embedded
+web UI are included.
 
 ```bash
 ./scripts/build-linux-amd64.sh
@@ -28,24 +28,25 @@ make alloy
 
 ## Slim profile
 
-A metrics-focused distribution for host monitoring and SQL query metrics:
+A metrics-focused distribution for host monitoring, Beyla eBPF, and SQL query metrics:
 
 **Flow components**
 
+- `beyla.ebpf`
 - `prometheus.exporter.unix`, `process`, `docker_state`, `smartctl`, `postgres`, `self`, `static`
 - `prometheus.scrape`, `prometheus.relabel`, `prometheus.remote_write`
 - `discovery.relabel`, `local.file`, `local.file_match`
 - `otelcol.receiver.sqlquery`, `otelcol.exporter.prometheus`
-- `otelcol.processor.batch`, `otelcol.processor.memorylimiter`
-- `otelcol.auth.basic`, `otelcol.storage.file`, `otelcol.exporter.debug`
+- `otelcol.processor.batch`, `otelcol.processor.attributes`, `otelcol.processor.memorylimiter`
+- `otelcol.exporter.otlphttp`, `otelcol.auth.basic`, `otelcol.storage.file`, `otelcol.exporter.debug`
 
 **Excluded**
 
 - Embedded web UI (`embedalloyui`)
 - Kubernetes Prometheus operators (`prometheus.operator.*`)
 - Vendor Prometheus exporters (Apache, SNMP, cloud vendor exporters, etc.)
-- Loki, Pyroscope, Beyla, Faro, database observability
-- Most OTel receivers/exporters beyond the sqlquery → prometheus path
+- Loki, Pyroscope, Faro, database observability
+- Most OTel receivers/exporters beyond sqlquery, Beyla traces, and prometheus remote write
 
 ```bash
 ./scripts/build-linux-amd64-slim.sh

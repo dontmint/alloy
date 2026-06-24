@@ -149,16 +149,18 @@ jobs:
             Use **slim** when you only need metrics collection and remote write on Linux hosts:
 
             **Included**
+            - `beyla.ebpf` (eBPF application/network metrics; optional OTLP trace export)
             - `prometheus.exporter.unix`, `process`, `docker_state`, `smartctl`, `postgres`, `self`, `static`
             - `prometheus.scrape`, `prometheus.relabel`, `prometheus.remote_write`
             - `discovery.relabel`, `local.file`, `local.file_match`
             - `otelcol.receiver.sqlquery` → `otelcol.exporter.prometheus` (requires `--stability.level=public-preview`)
+            - `otelcol.processor.attributes`, `otelcol.processor.batch`, `otelcol.exporter.otlphttp` (Beyla traces)
 
             **Excluded** (not linked into the binary)
             - Embedded web UI
             - Kubernetes Prometheus operators
             - Vendor Prometheus exporters beyond the list above
-            - Loki, Pyroscope, Beyla, Faro, database observability
+            - Loki, Pyroscope, Faro, database observability
             - Most other OTel receivers/exporters
 
             Best for: fleet host agents, central SQL metrics collectors, and other Prometheus remote-write-only deployments where binary size matters.
