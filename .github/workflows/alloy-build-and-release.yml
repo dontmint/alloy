@@ -123,10 +123,45 @@ jobs:
 
             ## Assets
 
-            | File | Profile | Description |
+            | File | Profile | Compressed size (approx.) |
             | --- | --- | --- |
-            | `alloy-linux-amd64.xz` | **full** | Full distribution with embedded UI (`embedalloyui`) and all Flow components |
-            | `alloy-linux-amd64-slim.xz` | **slim** | Metrics-focused build (`alloy_slim`): host/process/docker/smartctl/postgres exporters, Prometheus scrape/remote_write, `otelcol.receiver.sqlquery` — no embedded UI |
+            | `alloy-linux-amd64.xz` | **full** | ~72 MB |
+            | `alloy-linux-amd64-slim.xz` | **slim** | ~56 MB |
+
+            ## Full vs slim — which binary should I use?
+
+            Both builds share the same core metrics stack used for host monitoring and SQL metrics. Choose based on whether you need the full Alloy feature set or a smaller agent binary.
+
+            ### Full (`alloy-linux-amd64.xz`)
+
+            Use **full** when you need the complete Alloy distribution:
+
+            - Embedded web UI (`embedalloyui`) for local config inspection and debugging
+            - All upstream Flow components: Loki, Pyroscope, Beyla, Faro, database observability, and more
+            - Kubernetes Prometheus operators (`prometheus.operator.*`)
+            - Vendor Prometheus exporters (SNMP, Apache, cloud provider exporters, Redis, Kafka, etc.)
+            - Full OpenTelemetry Collector module set
+
+            Best for: exploratory configs, logging/tracing pipelines, Kubernetes operator workflows, or any config that references components outside the slim set.
+
+            ### Slim (`alloy-linux-amd64-slim.xz`)
+
+            Use **slim** when you only need metrics collection and remote write on Linux hosts:
+
+            **Included**
+            - `prometheus.exporter.unix`, `process`, `docker_state`, `smartctl`, `postgres`, `self`, `static`
+            - `prometheus.scrape`, `prometheus.relabel`, `prometheus.remote_write`
+            - `discovery.relabel`, `local.file`, `local.file_match`
+            - `otelcol.receiver.sqlquery` → `otelcol.exporter.prometheus` (requires `--stability.level=public-preview`)
+
+            **Excluded** (not linked into the binary)
+            - Embedded web UI
+            - Kubernetes Prometheus operators
+            - Vendor Prometheus exporters beyond the list above
+            - Loki, Pyroscope, Beyla, Faro, database observability
+            - Most other OTel receivers/exporters
+
+            Best for: fleet host agents, central SQL metrics collectors, and other Prometheus remote-write-only deployments where binary size matters.
 
             Build profile details: `docs/build-profiles.md`
 
