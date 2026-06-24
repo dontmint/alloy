@@ -18,9 +18,13 @@ concurrency:
 
 jobs:
   build_linux_amd64:
-    name: Build linux/amd64
+    name: Build linux/amd64 (${{ matrix.profile }})
     if: github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [full, slim]
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -34,6 +38,7 @@ jobs:
           cache: true
 
       - name: Set up Node.js
+        if: matrix.profile == 'full'
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version-file: internal/web/ui/.nvmrc
@@ -43,8 +48,13 @@ jobs:
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
 
-      - name: Build Alloy with embedded UI
-        run: ./scripts/build-linux-amd64.sh
+      - name: Build Alloy (${{ matrix.profile }})
+        run: |
+          if [ "${{ matrix.profile }}" = "slim" ]; then
+            ./scripts/build-linux-amd64-slim.sh
+          else
+            ./scripts/build-linux-amd64.sh
+          fi
         env:
           VERSION: ${{ github.sha }}
 
@@ -76,32 +86,54 @@ jobs:
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y make gcc xz-utils file
 
-      - name: Build Alloy with embedded UI
+      - name: Build full profile
         run: ./scripts/build-linux-amd64.sh
         env:
           VERSION: ${{ github.ref_name }}
 
-      - name: Package binary
+      - name: Package full binary
         run: |
           mkdir -p dist
           cp build/alloy dist/alloy-linux-amd64
           chmod +x dist/alloy-linux-amd64
           xz -9 -k dist/alloy-linux-amd64
+
+      - name: Build slim profile
+        run: ./scripts/build-linux-amd64-slim.sh
+        env:
+          VERSION: ${{ github.ref_name }}
+
+      - name: Package slim binary
+        run: |
+          cp build/alloy dist/alloy-linux-amd64-slim
+          chmod +x dist/alloy-linux-amd64-slim
+          xz -9 -k dist/alloy-linux-amd64-slim
           ls -lh dist/
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@288696be3916479e99fa944c72825e9b3e192be4 # v2.0.3
         with:
           name: Alloy ${{ github.ref_name }}
-          files: dist/alloy-linux-amd64.xz
+          files: |
+            dist/alloy-linux-amd64.xz
+            dist/alloy-linux-amd64-slim.xz
           generate_release_notes: false
           body: |
-            dontmint Alloy **v1.17.0-extended** — Scaleflex extended distribution (embedded UI, `embedalloyui`).
+            dontmint Alloy **${{ github.ref_name }}** — linux/amd64 release with **full** and **slim** build profiles.
 
-            ## What's new in this release
+            ## Assets
+
+            | File | Profile | Description |
+            | --- | --- | --- |
+            | `alloy-linux-amd64.xz` | **full** | Full distribution with embedded UI (`embedalloyui`) and all Flow components |
+            | `alloy-linux-amd64-slim.xz` | **slim** | Metrics-focused build (`alloy_slim`): host/process/docker/smartctl/postgres exporters, Prometheus scrape/remote_write, `otelcol.receiver.sqlquery` — no embedded UI |
+
+            Build profile details: `docs/build-profiles.md`
+
+            ## What's new
 
             ### `otelcol.receiver.sqlquery` (Public Preview)
-            - OTel SQL Query Receiver for central sql_exporter migration
+            - OTel SQL Query Receiver for SQL metrics migration
             - ClickHouse (`clickhouse-go/v2`) and Postgres (`lib/pq`) drivers linked
             - Forked `internal/sqlquery` adds `driver = "clickhouse"` support (upstream v0.147.0 omits it)
             - Requires Alloy `--stability.level=public-preview`
@@ -109,10 +141,9 @@ jobs:
 
             ### `prometheus.exporter.smartctl`
             - SMART disk health metrics via smartctl JSON (Linux)
-            - Configurable scan interval, rescan, device include/exclude filters
 
             ### `prometheus.exporter.docker_state`
-            - Docker container state metrics from the local daemon (replaces cadvisor/Vector path for state)
+            - Docker container state metrics from the local daemon
 
             ## Usage examples
 
@@ -134,17 +165,8 @@ jobs:
                 metrics = [otelcol.exporter.prometheus.default.input]
               }
             }
-
-            prometheus.exporter.smartctl "example" {
-              smartctl_path     = "/usr/sbin/smartctl"
-              smartctl_interval = "60s"
-            }
-
-            prometheus.exporter.docker_state "example" {
-              docker_host   = "unix:///var/run/docker.sock"
-              cache_period  = 1
-              enable_labels = true
-            }
             ```
 
-            Unpack: `xz -d alloy-linux-amd64.xz && chmod +x alloy-linux-amd64`
+            Unpack full: `xz -d alloy-linux-amd64.xz && chmod +x alloy-linux-amd64`
+
+            Unpack slim: `xz -d alloy-linux-amd64-slim.xz && chmod +x alloy-linux-amd64-slim`

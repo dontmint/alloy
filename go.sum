@@ -1229,6 +1229,9 @@ github.com/gopherjs/gopherjs v1.17.2/go.mod h1:pRRIvn/QzFLrKfvEz3qUuEhtE/zLCWfre
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
+github.com/gorilla/securecookie v1.1.2 h1:YCIWL56dvtr73r6715mJs5ZvhtnY73hBvEF8kXD8ePA=
+github.com/gorilla/securecookie v1.1.2/go.mod h1:NfCASbcHqRSY+3a8tlWJwsQap2VX5pwzwo4h3eOamfo=
+github.com/gorilla/sessions v1.2.1 h1:DHd3rPN5lE3Ts3D8rKkQ8x/0kqfeNmBAaiSi+o7FsgI=
 github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
 github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 h1:JeSE6pjso5THxAzdVpqr6/geYxZytqFMBCOtn/ujyeo=
@@ -1917,8 +1920,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcompone
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcomponent v0.147.0/go.mod h1:sgFPVHa5KMwNHJYre5pwEohNY8j45YjcL00aGp/byk8=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/splunk v0.147.0 h1:IVIhnJGL3X8zZmNEwL2gHF1BEvVnyF/cx5KXtKm5BTg=
 github.com/open-telemetry/opentelemetry-collector-contrib/internal/splunk v0.147.0/go.mod h1:nygdEYYHNhkmb2ok6uzuqT0lgTtRFKkI2ArvL1IvwvI=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.147.0 h1:e/dv7wg0Pr0h7ArkMOvqjq3db5f6+fpm7tjt9HNcGJA=
-github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.147.0/go.mod h1:8JU5gYDRQ4YsZ+p+blNvZruaI7Jl+KI5AP6Gl1v/HZo=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.147.0 h1:+DH++aootBKLDp11qaj9JM3rSGvk2sZvp68ztRjw3Uk=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.147.0/go.mod h1:LkYkAF9lhFSJS5NTMOq230JPF+LFfCkdla+Cm+pmsjg=
 github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.147.0 h1:TUbXDTIjnZpXCAA2MCXrRCVcsT6kwPflPd8DLzcWzsI=

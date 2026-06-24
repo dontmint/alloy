@@ -199,6 +199,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/PuerkitoBio/rehttp v1.4.0 // indirect
+	github.com/SAP/go-hdb v1.15.0 // indirect
 	github.com/STARRY-S/zip v0.2.3 // indirect
 	github.com/Shopify/sarama v1.38.1 // indirect
 	github.com/Showmax/go-fqdn v1.0.0 // indirect
@@ -531,6 +532,7 @@ require (
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
+	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jessevdk/go-flags v1.6.1 // indirect
@@ -665,6 +667,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/pdatautil v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sharedcomponent v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/splunk v0.147.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchperresourceattr v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/batchpersignal v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/core/xidutils v0.147.0 // indirect
@@ -712,6 +715,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/nginxreceiver v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/solacereceiver v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/splunkhecreceiver v0.147.0 // indirect
+	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/syslogreceiver v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tcplogreceiver v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/vcenterreceiver v0.147.0 // indirect
@@ -836,6 +840,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.480 // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tg123/go-htpasswd v1.2.4 // indirect
+	github.com/thda/tds v0.1.7 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect

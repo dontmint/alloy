@@ -14,7 +14,7 @@ import (
 	otelcomponent "go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/pipeline"
 
-	// Register SQL drivers used by Scaleflex sql_exporter parity (ClickHouse + Postgres).
+	// Register SQL drivers used by sqlquery receiver (ClickHouse + Postgres).
 	_ "github.com/ClickHouse/clickhouse-go/v2"
 	_ "github.com/lib/pq"
 )

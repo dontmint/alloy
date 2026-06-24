@@ -110,7 +110,7 @@ require (
 	github.com/lib/pq v1.12.3
 	github.com/mackerelio/go-osstat v0.2.5
 	github.com/miekg/dns v1.1.72
-	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c // indirect
+	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f
 	github.com/natefinch/atomic v1.0.1
 	github.com/ncabatoff/process-exporter v0.8.7
@@ -846,7 +846,7 @@ require (
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.480 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm v1.0.480 // indirect
 	github.com/tg123/go-htpasswd v1.2.4 // indirect
-	github.com/tidwall/gjson v1.18.0 // indirect
+	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/tinylru v1.2.1 // indirect
@@ -988,6 +988,7 @@ require (
 
 require (
 	github.com/99designs/gqlgen v0.17.89
+	github.com/ClickHouse/clickhouse-go/v2 v2.43.0
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/extension/googleclientauthextension v0.55.0
 	github.com/charmbracelet/huh v1.0.0
 	github.com/moby/moby/api v1.54.2
@@ -1010,7 +1011,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/internal v1.2.0 // indirect
 	github.com/BobuSumisu/aho-corasick v1.0.3 // indirect
 	github.com/ClickHouse/ch-go v0.71.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.43.0 // indirect
 	github.com/DataDog/datadog-agent/pkg/config/basic v0.0.0-20260213154712-e02b9359151a // indirect
 	github.com/DataDog/datadog-agent/pkg/config/helper v0.77.0-devel.0.20260213154712-e02b9359151a // indirect
 	github.com/DataDog/datadog-agent/pkg/orchestrator/util v0.77.0-devel.0.20260213154712-e02b9359151a // indirect
@@ -1087,7 +1087,6 @@ require (
 	github.com/nwaples/rardecode/v2 v2.2.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/extension/internal/credentialsfile v0.147.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/internal/sqlquery v0.147.0 // indirect
-	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.147.0 // indirect
 	github.com/opencontainers/cgroups v0.0.4 // indirect
 	github.com/oschwald/maxminddb-golang/v2 v2.2.0 // indirect
 	github.com/paulmach/orb v0.12.0 // indirect

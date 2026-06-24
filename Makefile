@@ -81,6 +81,7 @@
 ##   RELEASE_BUILD        Set to 1 to build release binaries.
 ##   VERSION              Version to inject into built binaries.
 ##   GO_TAGS              Extra tags to use when building.
+##   ALLOY_BUILD_PROFILE  Build profile: full (default) or slim.
 ##   DOCKER_PLATFORM      Overrides platform to build Docker images for (defaults to host platform).
 ##   GOEXPERIMENT         Used to enable Go features behind feature flags.
 ##   SKIP_UI_BUILD        Set to 1 to skip the UI build (assumes UI assets already exist).
@@ -108,6 +109,13 @@ GOARM                		?= $(shell go env GOARM)
 CGO_ENABLED          		?= 1
 RELEASE_BUILD        		?= 0
 GOEXPERIMENT         		?= $(shell go env GOEXPERIMENT)
+ALLOY_BUILD_PROFILE  		?= full
+BUILDER_CONFIG       		?= builder-config.yaml
+ifeq ($(ALLOY_BUILD_PROFILE),slim)
+BUILDER_CONFIG       		:= builder-config.slim.yaml
+override GO_TAGS := $(strip $(filter-out embedalloyui,$(GO_TAGS)) alloy_slim)
+SKIP_UI_BUILD        		?= 1
+endif
 
 # Determine the golangci-lint binary path using Make functions where possible.
 # Priority: GOBIN, GOPATH/bin, PATH (via shell), Fallback Name.
@@ -128,7 +136,7 @@ PROPAGATE_VARS := \
     BUILD_IMAGE GOOS GOARCH GOARM CGO_ENABLED RELEASE_BUILD \
     ALLOY_BINARY \
     VERSION GO_TAGS GOEXPERIMENT GOLANGCI_LINT_BINARY \
-    SKIP_CODE_GENERATION \
+    SKIP_CODE_GENERATION ALLOY_BUILD_PROFILE BUILDER_CONFIG \
 
 #
 # Constants for targets
@@ -141,7 +149,7 @@ ifeq ($(filter gore2regex,$(GO_TAGS)),)
 override GO_TAGS := $(strip gore2regex $(GO_TAGS))
 endif
 
-GO_ENV := GOEXPERIMENT=$(GOEXPERIMENT) GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) CGO_ENABLED=$(CGO_ENABLED)
+GO_ENV := GOEXPERIMENT=$(GOEXPERIMENT) GOOS=$(GOOS) GOARCH=$(GOARCH) GOARM=$(GOARM) CGO_ENABLED=$(CGO_ENABLED) GOTOOLCHAIN=go1.26.4
 
 VERSION      ?= $(shell bash ./scripts/image-tag)
 GIT_REVISION := $(shell git rev-parse --short HEAD)
@@ -336,7 +344,7 @@ generate-module-dependencies:
 ifeq ($(USE_CONTAINER),1)
 	$(RERUN_IN_CONTAINER)
 else
-	GOOS= GOARCH= go run -C tools ./cmd generate module-dependencies --dependency-yaml=$(CURDIR)/dependency-replacements.yaml
+	GOOS= GOARCH= GOTOOLCHAIN=go1.26.4 go run -C tools ./cmd generate module-dependencies --dependency-yaml=$(CURDIR)/dependency-replacements.yaml
 endif
 
 generate-source-code:
@@ -352,11 +360,12 @@ generate-otel-collector-distro:
 ifeq ($(USE_CONTAINER),1)
 	$(RERUN_IN_CONTAINER)
 else
-	@if [ -f ./collector/go.mod ]; then \
-		cd ./collector && go mod tidy; \
-	fi
 	# Here we clear the GOOS and GOARCH env variables so we're not accidentally cross compiling the builder tool within generate
-	cd ./collector && GOOS= GOARCH= BUILDER_VERSION=$(BUILDER_VERSION) go generate
+	cd ./collector && GOOS= GOARCH= go run go.opentelemetry.io/collector/cmd/builder@$(BUILDER_VERSION) --config ./$(BUILDER_CONFIG) --skip-compilation
+	@if [ "$(ALLOY_BUILD_PROFILE)" != "slim" ]; then \
+		cd ./collector && GOOS= GOARCH= go mod tidy; \
+	fi
+	cd ./collector && GOOS= GOARCH= go run -tags "$(GO_TAGS)" ./generator/generator.go --main-path ./main.go --main-alloy-path ./main_alloy.go
 endif
 
 generate-ui:
@@ -468,6 +477,8 @@ info:
 	@printf "RELEASE_BUILD       = $(RELEASE_BUILD)\n"
 	@printf "VERSION             = $(VERSION)\n"
 	@printf "GO_TAGS             = $(GO_TAGS)\n"
+	@printf "ALLOY_BUILD_PROFILE = $(ALLOY_BUILD_PROFILE)\n"
+	@printf "BUILDER_CONFIG      = $(BUILDER_CONFIG)\n"
 	@printf "GOEXPERIMENT        = $(GOEXPERIMENT)\n"
 
 # awk magic to print out the comment block at the top of this file.

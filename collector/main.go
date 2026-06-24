@@ -19,7 +19,7 @@ import (
 func main() {
 	info := component.BuildInfo{
 		Command:     "alloy",
-		Description: "Alloy OTel Collector distribution.",
+		Description: "Alloy OTel Collector distribution (slim profile).",
 		Version:     CollectorVersion(),
 	}
 
