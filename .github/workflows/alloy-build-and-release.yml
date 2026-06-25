@@ -36,6 +36,9 @@ jobs:
       matrix:
         profile: [full, slim]
     steps:
+      - name: Install git for checkout
+        run: dnf install -y git
+
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -78,6 +81,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Install git for checkout
+        run: dnf install -y git
+
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -123,6 +129,14 @@ jobs:
           xz -9 -k dist/alloy-linux-amd64-slim
           ls -lh dist/
 
+      - name: Compute release asset SHA256 checksums
+        id: checksums
+        run: |
+          FULL_XZ_SHA256=$(sha256sum dist/alloy-linux-amd64.xz | awk '{print $1}')
+          SLIM_XZ_SHA256=$(sha256sum dist/alloy-linux-amd64-slim.xz | awk '{print $1}')
+          echo "full_xz_sha256=${FULL_XZ_SHA256}" >> "$GITHUB_OUTPUT"
+          echo "slim_xz_sha256=${SLIM_XZ_SHA256}" >> "$GITHUB_OUTPUT"
+
       - name: Publish GitHub release
         uses: softprops/action-gh-release@288696be3916479e99fa944c72825e9b3e192be4 # v2.0.3
         with:
@@ -142,6 +156,13 @@ jobs:
             | --- | --- | --- |
             | `alloy-linux-amd64.xz` | **full** | ~72 MB |
             | `alloy-linux-amd64-slim.xz` | **slim** | ~56 MB |
+
+            SHA256 checksums are for the compressed `.xz` download artifacts (verify after download, before `xz -d`).
+
+            | Asset | SHA256 |
+            | --- | --- |
+            | `alloy-linux-amd64.xz` | `${{ steps.checksums.outputs.full_xz_sha256 }}` |
+            | `alloy-linux-amd64-slim.xz` | `${{ steps.checksums.outputs.slim_xz_sha256 }}` |
 
             ## Full vs slim — which binary should I use?
 

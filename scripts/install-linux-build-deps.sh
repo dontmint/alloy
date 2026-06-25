@@ -13,7 +13,7 @@ fi
 case "${ID:-}" in
   almalinux|rhel|centos|rocky)
     dnf install -y \
-      gcc gcc-c++ make git file xz \
+      gcc gcc-c++ make git which file xz \
       binutils \
       systemd-devel
     # Full profile UI build (Node 20 module stream on EL8).
@@ -25,7 +25,7 @@ case "${ID:-}" in
     export DEBIAN_FRONTEND=noninteractive
     apt-get update
     apt-get install -y \
-      build-essential make git file xz-utils \
+      build-essential make git which xz-utils \
       binutils \
       libsystemd-dev
     if [[ "${INSTALL_NODE:-0}" == "1" ]]; then
