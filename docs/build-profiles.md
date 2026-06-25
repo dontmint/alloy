@@ -85,3 +85,6 @@ ALLOY_BUILD_PROFILE=slim make alloy
 
 Keep slim intentionally small; prefer the full profile when you need logging,
 tracing, Kubernetes operators, or vendor exporters.
+
+Release binaries are built on AlmaLinux 8 (glibc 2.28). See
+`docs/linux-binary-compatibility.md` for supported distros.

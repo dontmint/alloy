@@ -13,8 +13,12 @@ export SKIP_UI_BUILD="${SKIP_UI_BUILD:-1}"
 # Slim profile omits embedalloyui; allow extra tags via GO_TAGS.
 export GO_TAGS="${GO_TAGS:-gore2regex alloy_slim}"
 
-echo "Building slim Alloy ${GOOS}/${GOARCH} with GO_TAGS=${GO_TAGS}"
+echo "Building slim Alloy ${GOOS}/${GOARCH} with GO_TAGS=${GO_TAGS} CGO_ENABLED=${CGO_ENABLED:-1}"
 make alloy
 
 ls -lh build/alloy
 file build/alloy
+
+if [[ "${VERIFY_GLIBC:-0}" == "1" ]]; then
+  ./scripts/verify-glibc-requirements.sh build/alloy
+fi

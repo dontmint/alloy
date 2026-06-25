@@ -17,8 +17,12 @@ else
   export GO_TAGS="${GO_TAGS:-gore2regex embedalloyui}"
 fi
 
-echo "Building Alloy (${ALLOY_BUILD_PROFILE}) ${GOOS}/${GOARCH} with GO_TAGS=${GO_TAGS}"
+echo "Building Alloy (${ALLOY_BUILD_PROFILE}) ${GOOS}/${GOARCH} with GO_TAGS=${GO_TAGS} CGO_ENABLED=${CGO_ENABLED:-1}"
 make alloy
 
 ls -lh build/alloy
 file build/alloy
+
+if [[ "${VERIFY_GLIBC:-0}" == "1" ]]; then
+  ./scripts/verify-glibc-requirements.sh build/alloy
+fi
